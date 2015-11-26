@@ -1,7 +1,10 @@
 // // Angular Module
 
-// ChromeApps API
+var G_NONE_DEVICE = {address: "None", name: "None"};
+
 var gBluetoothDevices = {};
+
+var gSelectedDevice = G_NONE_DEVICE;
 
 var app = angular.module('index', [], function($provide) {
       $provide.decorator('$window', function($delegate) {
@@ -16,11 +19,6 @@ app.controller('HelloController', function($scope) {
     {message: "heytgvhbjnkmlkjhgvf"}
   ];
   
-  updateDevices = function() {
-    $scope.devices = gBluetoothDevices;
-    console.log("update");
-  };
-  
   addGreet = function() {
     var len = $scope.greets.length;
     $scope.greets[len] = {message: "hello"};
@@ -31,12 +29,57 @@ app.controller('HelloController', function($scope) {
     addGreet();
   };
   
-  $scope.updateScannedDevices = function() {
-    updateDevices();
-    console.log("updateScannedDevices: " + gBluetoothDevices["00:13:04:85:B8:1C"].address);
+});
+
+app.controller('BluetoothSelectController', function($scope) {  
+
+  // initialize.
+  $scope.selectedDevice = gSelectedDevice;
+
+  // 既知のBluetoothデバイスのリストを更新する。
+  updateDevices = function() {
+    $scope.devices = gBluetoothDevices;
+    console.log("BluetoothSelectController: updateDevices");
+  };
+
+  // 接続するBluetoothデバイスを選択する
+  selectDevice = function(address) {
+    $scope.selectedDevice = gBluetoothDevices[address];
+    gSelectedDevice = $scope.selectedDevice;
+    console.log($scope.selectedDevice.name);
   };
   
-  
+  $scope.updateScannedDevices = function() {
+    updateDevices();
+    console.log("BluetoothSelectController: updateScannedDevices");
+  };
+
+  $scope.onSelectDevice = function(address) {
+    console.log("BluetoothSelectController: onSelectDevice");
+    selectDevice(address);
+  };
+});
+
+app.controller('BluetoothConnectionController', function($scope) {
+  $scope.targetDevice = gSelectedDevice;
+
+  $scope.send = function() {
+    // Bluetooth socket...
+    var uuid = '180D';
+
+    var onConnectedCallback = function() {
+      if(chrome.runtime.lastError) {
+        console.log("Connection failed: " + chrome.runtime.lastError.message);
+      } else {
+        console.log("Connection succeed!");
+      }
+    };
+
+    chrome.bluetoothSocket.create(function(createInfo) {
+      chrome.bluetoothSocket.connect(createInfo.socketId, $scope.targetDevice.address, uuid, onConnectedCallback);
+    });
+  };
+
 });
 
 var updateDeviceName = function(device) {

@@ -19,6 +19,6 @@
   
   "bluetooth": {
     "uuids": [ "180D" ],
-    "low_energy": true
+    "socket": true
   }
 }

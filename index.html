@@ -14,29 +14,28 @@
   <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.js"></script>
 
   <!-- Angular modules -->
-  <script src="index_app.js"></script>
+  <script src="./bluetooth_module.js"></script>
 </head>
-
 <body>
-  <ul ng-controller="HelloController">
-    <li ng-repeat="greet in greets track by $index">
-      <span>hhhh</span>
-      <p>{{greet.message}}</p>
+  <ul ng-controller="BluetoothSelectController">
+    <li ng-repeat="device in devices">
+      <span>Address: {{device.address}}</span>
+      <p>Name: {{device.name}}</p>
+      <button class="btn btn-small btn-info" ng-click="onSelectDevice(device.address)">Select</button>
     </li>
     <li>
-      <button class="btn btn-small btn-default" ng-click="onClick()"></button>
-    </li>
-  </ul>
-  
-  <ul ng-controller="HelloController">
-    <li ng-repeat="(address, name) in devices">
-      <span>Address: {{address}}</span>
-      <p>Name: {{name}}</p>
+      <button class="btn btn-success" ng-click="updateScannedDevices()">Update device list</button>
     </li>
     <li>
-      <button class="btn btn-success" ng-click="updateScannedDevices()"></button>
+      <p>{{selectedDevice.name}}</p>
     </li>
   </ul>
 
+  <div ng-controller="BluetoothConnectionController">
+    <form class="simple-form">
+      <input type="text"></input>
+      <input type="button" ng-click="send()" value="Send"></input>
+    </form>
+  </div>
 </body>
 </html>
